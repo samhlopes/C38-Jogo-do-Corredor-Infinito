@@ -48,14 +48,14 @@ function setup() {
 
   trex.scale = 0.5;
   
-  ground = createSprite(200,180,400,20);
+  ground = createSprite(0,180,400,20);
   ground.addImage("ground",groundImage);
   ground.x = ground.width /2;
   
-  gameOver = createSprite(300,100);
+  gameOver = createSprite(300,50);
   gameOver.addImage(gameOverImg);
   
-  restart = createSprite(300,140);
+  restart = createSprite(300,90);
   restart.addImage(restartImg);
   
  
@@ -71,7 +71,7 @@ function setup() {
 
   
   trex.setCollider("rectangle",0,0,trex.width,trex.height);
-  trex.debug = true
+  trex.debug = false
   
   score = 0;
   
@@ -81,15 +81,18 @@ function draw() {
   
   background(180);
   //displaying score
-  text("Score: "+ score, 500,50);
+  text("Score: "+ score, camera.position.x+200,50);
   
+  
+  invisibleGround.x = camera.position.x
+
+  camera.position.x = trex.x
   
   if(gameState === PLAY){
 
     gameOver.visible = false;
     restart.visible = false;
-    
-    ground.velocityX = -(4 + 3* score/100)
+    trex.velocityX =  (4 + 3* score/100)
     //scoring
    score = score + Math.round((frameRate()/60))
     
@@ -99,8 +102,8 @@ function draw() {
        checkPointSound.play() 
     }
     
-    if (ground.x < 0){
-      ground.x = ground.width/2;
+    if (ground.x < camera.position.x){
+      ground.x = camera.position.x + ground.width/2 - 300;
     }
     
     //jump when the space key is pressed
@@ -129,13 +132,14 @@ function draw() {
    else if (gameState === END) {
       gameOver.visible = true;
       restart.visible = true;
+      gameOver.x = camera.position.x
+      restart.x = camera.position.x
      
      //change the trex animation
       trex.changeAnimation("collided", trex_collided);
     
      
-     
-      ground.velocityX = 0;
+      trex.velocityX = 0
       trex.velocityY = 0
       
      
@@ -174,8 +178,9 @@ function reset(){
 
 function spawnObstacles(){
  if (frameCount % 60 === 0){
-   var obstacle = createSprite(600,165,10,40);
-   obstacle.velocityX = -(4 + 3* score/100)
+   var obstacle = createSprite(camera.position.x + 300,165,10,40);
+   obstacle.velocityX = 0 
+   //-(4 + 3* score/100)
    
     //generate random obstacles
     var rand = Math.round(random(1,6));
@@ -207,11 +212,11 @@ function spawnObstacles(){
 function spawnClouds() {
   //write code here to spawn the clouds
   if (frameCount % 60 === 0) {
-    var cloud = createSprite(600,120,40,10);
+    var cloud = createSprite(camera.position.x + 300,120,40,10);
     cloud.y = Math.round(random(80,120));
     cloud.addImage(cloudImage);
     cloud.scale = 0.5;
-    cloud.velocityX = -3;
+    cloud.velocityX = 0;
     
      //assign lifetime to the variable
     cloud.lifetime = 200;
